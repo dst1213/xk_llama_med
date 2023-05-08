@@ -4,9 +4,7 @@ out/
 __pycache__/
 checkpoint**
 minimal-llama**
-lora-llama-med
 upload.py
-lora-**
 *.out
 *result
 *ckpt
