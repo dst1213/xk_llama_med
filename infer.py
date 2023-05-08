@@ -13,6 +13,7 @@ from utils.prompter import Prompter
 if torch.cuda.is_available():
     device = "cuda"
 
+
 def load_instruction(instruct_dir):
     input_data = []
     with open(instruct_dir, "r") as f:
@@ -25,17 +26,17 @@ def load_instruction(instruct_dir):
 
 
 def main(
-    load_8bit: bool = False,
-    base_model: str = "",
-    # the infer data, if not exists, infer the default instructions in code
-    instruct_dir: str = "",
-    use_lora: bool = True,
-    lora_weights: str = "tloen/alpaca-lora-7b",
-    # The prompt template to use, will default to med_template.
-    prompt_template: str = "med_template",
-    use_instant: bool = False,
-    query:str = "",
-    init: bool = True
+        load_8bit: bool = False,
+        base_model: str = "",
+        # the infer data, if not exists, infer the default instructions in code
+        instruct_dir: str = "",
+        use_lora: bool = True,
+        lora_weights: str = "tloen/alpaca-lora-7b",
+        # The prompt template to use, will default to med_template.
+        prompt_template: str = "med_template",
+        use_instant: bool = False,
+        query: str = "",
+        init: bool = True
 ):
     if init:
         prompter = Prompter(prompt_template)
@@ -66,15 +67,16 @@ def main(
             model = torch.compile(model)
 
     def evaluate(
-        instruction,
-        input=None,
-        temperature=0.1,
-        top_p=0.75,
-        top_k=40,
-        num_beams=4,
-        max_new_tokens=256,
-        **kwargs,
+            instruction,
+            input=None,
+            temperature=0.1,
+            top_p=0.75,
+            top_k=40,
+            num_beams=4,
+            max_new_tokens=256,
+            **kwargs,
     ):
+
         prompt = prompter.generate_prompt(instruction, input)
         inputs = tokenizer(prompt, return_tensors="pt")
         input_ids = inputs["input_ids"].to(device)
