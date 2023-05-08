@@ -34,34 +34,36 @@ def main(
     # The prompt template to use, will default to med_template.
     prompt_template: str = "med_template",
     use_instant: bool = False,
-    query:str = ""
+    query:str = "",
+    init: bool = True
 ):
-    prompter = Prompter(prompt_template)
-    tokenizer = LlamaTokenizer.from_pretrained(base_model)
-    model = LlamaForCausalLM.from_pretrained(
-        base_model,
-        load_in_8bit=load_8bit,
-        torch_dtype=torch.float16,
-        device_map="auto",
-    )
-    if use_lora:
-        print(f"using lora {lora_weights}")
-        model = PeftModel.from_pretrained(
-            model,
-            lora_weights,
+    if init:
+        prompter = Prompter(prompt_template)
+        tokenizer = LlamaTokenizer.from_pretrained(base_model)
+        model = LlamaForCausalLM.from_pretrained(
+            base_model,
+            load_in_8bit=load_8bit,
             torch_dtype=torch.float16,
+            device_map="auto",
         )
-    # unwind broken decapoda-research config
-    model.config.pad_token_id = tokenizer.pad_token_id = 0  # unk
-    model.config.bos_token_id = 1
-    model.config.eos_token_id = 2
-    if not load_8bit:
-        model.half()  # seems to fix bugs for some users.
+        if use_lora:
+            print(f"using lora {lora_weights}")
+            model = PeftModel.from_pretrained(
+                model,
+                lora_weights,
+                torch_dtype=torch.float16,
+            )
+        # unwind broken decapoda-research config
+        model.config.pad_token_id = tokenizer.pad_token_id = 0  # unk
+        model.config.bos_token_id = 1
+        model.config.eos_token_id = 2
+        if not load_8bit:
+            model.half()  # seems to fix bugs for some users.
 
-    model.eval()
+        model.eval()
 
-    if torch.__version__ >= "2" and sys.platform != "win32":
-        model = torch.compile(model)
+        if torch.__version__ >= "2" and sys.platform != "win32":
+            model = torch.compile(model)
 
     def evaluate(
         instruction,
