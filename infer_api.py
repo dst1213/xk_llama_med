@@ -137,4 +137,4 @@ if __name__ == "__main__":
 
     gr.Interface(fn=chatbot, inputs=inputs, outputs=outputs, title="LLaMA Med Chatbot",
                  description="Ask anything you want",
-                 theme="compact").launch(share=True, server_port=5000)
+                 theme="compact").queue().launch(share=True, server_port=5000)
